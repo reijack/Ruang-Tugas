@@ -27,3 +27,179 @@ body.dark .primary{background:#7550d3;color:#fff}body.dark .primary:hover{backgr
 #profile-error:empty{display:none}
 
 .week-copy-toolbar{display:flex;justify-content:flex-end;margin:0 0 12px}.detail-footer .detail-actions{flex-wrap:wrap}#week-form input{min-width:0}
+/* Liquid glass surfaces share a light source across the workspace. */
+body {
+  --glass-pane: linear-gradient(135deg, #ffffffdf, #ffffff88);
+  --glass-bar: #f6f6ffde;
+  --glass-line: #ffffffd9;
+  --glass-rim: inset 0 1px 0 #ffffffeb, inset 0 -1px 0 #8e8bb522;
+  --glass-shadow: 0 6px 22px -12px #37306342;
+  --hero-fill: linear-gradient(110deg, #eae5ff 10%, #d8d5ff 53%, #c3e6f3);
+  --muted: #625e75;
+  --purple: #6045ba;
+  background-color: #efedf9;
+  background-image: radial-gradient(ellipse at 92% 7%, #b4e6f1a6, transparent 42%),
+    radial-gradient(ellipse at 23% 34%, #d2c2f8bf, transparent 48%),
+    linear-gradient(155deg, #edeafa, #eef4fa 70%, #e4ddf6);
+  background-attachment: fixed;
+}
+body.dark {
+  --glass-pane: linear-gradient(135deg, #35324ce8, #25273ac9);
+  --glass-bar: #211f32ed;
+  --glass-line: #a8a1d13d;
+  --glass-rim: inset 0 1px 0 #e3ddff26, inset 0 -1px 0 #10102055;
+  --glass-shadow: 0 8px 24px -14px #050411aa;
+  --hero-fill: linear-gradient(115deg, #342747, #38345c 57%, #294f61);
+  background-color: #1d1c2e;
+  background-image: radial-gradient(ellipse at 90% 7%, #255061a8, transparent 45%),
+    radial-gradient(ellipse at 23% 35%, #49315b99, transparent 48%),
+    linear-gradient(155deg, #202033, #1b2030 75%, #28233c);
+}
+.sidebar, .topbar, dialog:not(.lightbox), .toast {
+  background: var(--glass-bar);
+  border-color: var(--glass-line);
+  -webkit-backdrop-filter: blur(20px) saturate(135%);
+  backdrop-filter: blur(20px) saturate(135%);
+  box-shadow: var(--glass-rim), var(--glass-shadow);
+}
+.sidebar { overflow-y: auto; overscroll-behavior: contain; }
+.topbar { position: sticky; top: 0; z-index: 20; }
+body :is(.stat-card,.task-card,.right-panel,.settings-card,.subject-card,.calendar-card,.deadline-banner,.sidebar-note,.tip-card) {
+  background: var(--glass-pane);
+  border: 1px solid var(--glass-line);
+  border-radius: 18px;
+  box-shadow: var(--glass-rim), var(--glass-shadow);
+}
+body .welcome-banner {
+  isolation: isolate;
+  background: var(--hero-fill);
+  border: 1px solid var(--glass-line);
+  border-radius: 24px;
+  box-shadow: var(--glass-rim), var(--glass-shadow);
+}
+.welcome-banner::before {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  width: 70%; height: 170%;
+  right: -9%; top: -57%;
+  border-radius: 50%;
+  transform: rotate(-20deg);
+  border: 1px solid #ffffff72;
+  background: linear-gradient(165deg, transparent 45%, #ffffff18 80%, #ffffff64);
+  box-shadow: 0 10px 28px #655b9b12, inset 0 -2px 4px #ffffff55;
+}
+body .nav-item.active, body .nav-item[aria-current="page"] {
+  border-radius: 14px;
+  background: var(--purple-soft);
+  box-shadow: var(--glass-rim);
+}
+body .primary, body .brand-symbol {
+  color: white;
+  background: linear-gradient(155deg, #886be1, #5939ad 78%);
+  box-shadow: inset 0 1px 1px #ffffff70, 0 4px 10px #51339733;
+}
+.button { border-radius: 12px; }
+body:not(.dark) :is(.stat-top,.stat-bottom,.welcome-banner p,.task-note,.agenda-item span,.progress-caption,.sidebar-note p,.tip-card p) { color: var(--muted); }
+body:not(.dark) .eyebrow { color: #65518e; }
+.week-copy-toolbar .button { background: var(--glass-bar); }
+.page-heading > div, .tabs, .form-row > *, .settings-card { min-width: 0; }
+.page-heading h1 { overflow-wrap: anywhere; }
+@media (min-width: 721px) {
+  .topbar { height: 70px; }
+  .welcome-banner { min-height: 185px; padding-inline: 32px; }
+  .banner-art { right: 5%; top: 50%; transform: translateY(-50%); }
+}
+@media (max-width: 720px) {
+  main { padding: 22px clamp(14px, 4vw, 24px) 28px; }
+  .topbar { height: 60px; padding-inline: 12px; }
+  .topbar-right { gap: 3px; }
+  .breadcrumb { gap: 4px; min-width: 0; }
+  .breadcrumb > span { display: none; }
+  .breadcrumb strong { font-size: 14px; }
+  .topbar .icon-button, .topbar .avatar { width: 44px; height: 44px; }
+  .mobile-menu { margin-left: 0; }
+  .sidebar { visibility: hidden; max-width: 86vw; }
+  .sidebar.open { visibility: visible; }
+  .page-heading { flex-wrap: wrap; align-items: center; gap: 12px; }
+  .page-heading p { max-width: none; }
+  .page-heading .button, .button, .filters select, .filters input { min-height: 44px; }
+  .welcome-banner { padding: 18px; min-height: 155px; }
+  .welcome-copy { max-width: 62%; }
+  .banner-art { width: 38%; height: 100%; right: 0; top: 0; }
+  .stats-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+  .stat-card { padding: 14px; }
+  .stat-top { gap: 6px; font-size: 13px; }
+  .tabs-row { flex-wrap: wrap; align-items: center; gap: 6px; }
+  .tabs { gap: 10px; max-width: 100%; flex-wrap: wrap; }
+  .tab { min-height: 44px; padding-bottom: 4px; gap: 4px; }
+  .view-switch button { min-width: 42px; min-height: 42px; }
+  .filters { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .filters .search-box { grid-column: 1/-1; }
+  .filters select { width: 100%; min-width: 0; }
+  .task-card { padding: 17px; min-height: auto; }
+  .card-footer { flex-wrap: wrap; }
+  .dialog-head,.form-body,.detail-body,.copy-dialog-body,.confirm-dialog { padding: 18px; }
+  .dialog-footer,.detail-footer { padding: 14px 18px max(14px,env(safe-area-inset-bottom)); }
+  .detail-footer [data-week-copy] { order: 1; }
+  .detail-footer [data-complete] { grid-column: 1/-1; order: 5; }
+  input:not([type="checkbox"]),select,textarea,.filters input,.filters select { font-size: 16px; }
+  .app-footer { padding-bottom: max(20px,env(safe-area-inset-bottom)); }
+}
+@media (max-width: 420px) {
+  .form-row { grid-template-columns: 1fr; gap: 0; }
+  .tabs-row .tab { font-size: 13px; }
+  .subject-grid { grid-template-columns: 1fr; }
+  .profile-photo-row input { width: 100%; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  body :is(.stat-card,.task-card,.settings-card,.subject-card,.right-panel,.sidebar,.topbar,dialog:not(.lightbox),.toast) {
+    background: var(--surface);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@keyframes dialog-entry {
+  from { opacity: 0; transform: translateY(8px) scale(.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes backdrop-entry {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  dialog[open]:not(.lightbox) {
+    animation: dialog-entry 180ms cubic-bezier(.2,.75,.25,1);
+  }
+  dialog[open]::backdrop { animation: backdrop-entry 160ms ease-out; }
+  .button, .icon-button, .avatar, .nav-item, .subject-card, .task-card {
+    transition: transform 160ms ease-out, background-color 160ms ease-out,
+      border-color 160ms ease-out, box-shadow 160ms ease-out;
+  }
+  .icon-button:active, .avatar:active, .nav-item:active { transform: scale(.96); }
+}
+@media (max-width: 720px) and (prefers-reduced-motion: no-preference) {
+  .sidebar {
+    transition: transform 220ms cubic-bezier(.2,.75,.25,1), visibility 0s 220ms;
+  }
+  .sidebar.open { transition-delay: 0s; }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .task-card:hover, .subject-card:hover { transform: translateY(-2px); }
+  .task-card:active, .subject-card:active { transform: translateY(0); }
+}
+
+@media (any-pointer: fine) {
+  :root { --book-cursor: url("./book-cursor.svg") 2 3; }
+  body, dialog {
+    cursor: var(--book-cursor), auto;
+  }
+  :is(a[href], button, select, summary, [role="button"], [data-open], .task-card, .agenda-item, .calendar-cell) {
+    cursor: var(--book-cursor), pointer;
+  }
+  :is(textarea, input:not([type]), input[type="text"], input[type="search"], [contenteditable="true"]) {
+    cursor: text;
+  }
+  :is(button, input, select, textarea):disabled { cursor: not-allowed; }
+}
