@@ -46,7 +46,7 @@ Hasil Tailwind sudah disertakan; tidak ada CDN Tailwind yang harus dimuat untuk 
 - Galeri layar penuh, zoom, rotasi, navigasi foto, dan tombol keyboard kiri/kanan.
 - Kalender bulanan dengan navigasi bulan, tambah tugas dari tanggal, dan detail tugas dari kalender.
 - Koleksi per mata pelajaran dan penambahan mapel sendiri.
-- Nama profil, tema terang/gelap, dan contoh tugas yang bisa dibersihkan.
+- Profil pribadi dan tema terang/gelap.
 - Ekspor cadangan JSON mencakup seluruh tugas dan foto. Impor menggabungkan berdasarkan ID tugas dan memperbarui tugas dengan ID sama, tanpa menggandakan data.
 - Validasi struktur impor, tanggal, status, referensi foto, dan batas ukuran. Batas impor 50 MB berkas / 40 MB foto / 2.000 tugas.
 
@@ -54,7 +54,7 @@ Hasil Tailwind sudah disertakan; tidak ada CDN Tailwind yang harus dimuat untuk 
 
 Data disimpan hanya di browser/perangkat yang digunakan. Pengguna di perangkat lain memiliki data terpisah. Pengguna yang memakai profil browser yang sama akan melihat data yang sama. Belum ada sinkronisasi otomatis HP–laptop. Gunakan ekspor/impor untuk memindahkan tugas, dan ekspor berkala sebelum menghapus data browser. Mode privat bisa menghapus penyimpanan saat sesi berakhir.
 
-Pada kunjungan pertama, 8 tugas contoh akan dibuat. Klik **Hapus contoh** di daftar tugas atau pengaturan untuk memulai ruang kosong. Pengujian pengembangan tidak ikut dikirim sebagai data pengguna.
+Ruang Tugas dimulai dengan daftar kosong. Saat aplikasi diperbarui, tugas lama yang masih ditandai sebagai contoh beserta fotonya dibersihkan otomatis.
 
 ## Struktur
 
@@ -87,7 +87,7 @@ Untuk hosting statis lain, unggah seluruh isi folder dist. Service worker dan fi
 - **Form tugas → + Tambah mapel**: tambahkan mapel tanpa kehilangan isian tugas; mapel baru langsung terpilih.
 - **Ikon lonceng**: lihat tugas aktif yang mendekati deadline, beserta tugas terlewat. Klik untuk membuka detail. Tugas selesai otomatis keluar dari pengingat.
 - **Pengaturan & cadangan → Notifikasi deadline**: pilih H-1, H-2, H-3, atau H-7 serta jam pengingat (default 07:00 waktu perangkat). Klik Aktifkan notifikasi dan izinkan melalui browser. Tersedia tombol Coba notifikasi setelah izin diberikan.
-- Notifikasi perangkat diperiksa setiap menit dan saat kembali ke website, mulai jam pilihanmu. Masing-masing tugas maksimal satu notifikasi per tanggal lokal dan tanggal deadline, termasuk jika beberapa tab terbuka. Tugas contoh tidak memicu notifikasi perangkat; menyimpan edit tugas contoh menjadikannya tugas pribadi.
+- Notifikasi perangkat diperiksa setiap menit dan saat kembali ke website, mulai jam pilihanmu. Masing-masing tugas maksimal satu notifikasi per tanggal lokal dan tanggal deadline, termasuk jika beberapa tab terbuka.
 - Perhitungan H-N berdasarkan tanggal kalender, karena deadline tugas tidak memiliki jam. Pengingat berlanjut setiap hari dari H-N hingga tugas ditandai selesai.
 - **Batasan:** fitur ini memerlukan website tetap terbuka untuk memeriksa jadwal. Tidak ada server push atau alarm yang berjalan ketika seluruh tab/browser ditutup. Browser dapat menunda timer pada tab latar atau perangkat yang tidur; pengingat diperiksa kembali saat website aktif.
 - Izin ditolak/tidak didukung: aplikasi menjelaskan langkah berikutnya, dan pengingat di dalam website tetap berfungsi. Izin tidak diminta otomatis.
