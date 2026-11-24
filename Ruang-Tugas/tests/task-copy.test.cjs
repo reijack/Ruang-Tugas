@@ -1,0 +1,13 @@
+const assert=require('node:assert/strict'),C=require('../dist/task-copy.js');
+const task={id:'private-task-id',title:'Analisis unsur intrinsik cerpen',subject:'Bahasa Indonesia',date:'2026-11-24',status:'belum',priority:'tinggi',notes:'Baca cerpen yang dibagikan.\nAnalisis tokoh, latar, alur, dan amanat.'};
+const photos=[{id:'private-photo-id',caption:'Catatan dan soal dari kelas',blob:'private image bytes'},{caption:'Lanjutan catatan'}];
+const text=C.formatTask(task,photos);
+assert.equal(text,task.title+'\nCatatan: '+task.notes+'\nDeadline: Selasa, 24 November 2026');
+assert(C.formatTask({...task,time:'14:30'}).endsWith(', pukul 14:30'));
+assert(!C.formatTask({...task,time:'25:00'}).includes('pukul'));
+const dated=(date,time)=>({...task,date,time});
+const input=[dated('2026-12-01'),dated('2026-11-30'),dated('2026-11-24','16:00'),dated('2026-11-23'),dated('2026-11-24','08:00')];
+assert.deepEqual(C.tasksInRange(input,'2026-11-24','2026-11-30'),[input[4],input[2],input[1]]);
+assert.deepEqual(C.tasksInRange(input,'2026-11-25','2026-11-25'),[]);
+const longNotes='Catatan lengkap.\n'.repeat(500);assert(C.formatTask({...task,notes:longNotes},[]).includes(longNotes.trim()),'No note truncation');
+(async()=>{let copied='';assert(await C.writeText(text,{writeText:async value=>{copied=value}}));assert.equal(copied,text);assert.equal(await C.writeText(text,undefined),false);assert.equal(await C.writeText(text,{writeText:async()=>{throw Error('denied')}}),false);console.log('PASS: weekly range, deadline order, optional time, plain text format, and clipboard fallback.');})().catch(e=>{console.error(e);process.exitCode=1});

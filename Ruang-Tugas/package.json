@@ -1,0 +1,14 @@
+{
+  "name": "ruang-tugas",
+  "version": "1.2.0",
+  "private": true,
+  "description": "Pencatat tugas dan foto catatan sekolah",
+  "scripts": {
+    "build": "tailwindcss -i src/tailwind.css -o dist/tailwind.css --minify",
+    "check": "node --check dist/app.js && node --check dist/reminders.js && node --check dist/sw.js && node --check dist/task-copy.js && node --check dist/theme-init.js",
+    "test": "node tests/backup.test.cjs && node tests/reminders.test.cjs && node tests/task-copy.test.cjs"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.17"
+  }
+}

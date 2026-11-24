@@ -1,0 +1,13 @@
+const vm=require('node:vm'),fs=require('node:fs'),assert=require('node:assert/strict');
+const context=vm.createContext({RuangTaskCopy:require("../dist/task-copy.js"),console,Blob,atob,crypto:require('node:crypto').webcrypto,Date,URL});
+vm.runInContext(fs.readFileSync('dist/app.js','utf8').replace(/init\(\);\s*$/,''),context);
+const {validateBackup,validDate}=vm.runInContext('({validateBackup,validDate})',context);
+const task={id:'task-1',title:'Latihan',subject:'Matematika',date:'2026-11-27',status:'proses',notes:'Catatan',priority:'tinggi',photoIds:['photo-1'],created:123};
+const sample={app:'ruang-tugas',version:1,tasks:[task],photos:[{id:'photo-1',taskId:'task-1',caption:'Soal',data:'data:image/png;base64,iVBORw0KGgo='}]};
+let result=validateBackup(sample);assert.equal(result.tasks[0].priority,'tinggi');assert.equal(result.photos[0].blob.type,'image/png');assert.equal(result.photos[0].blob.size,8);
+assert.equal(result.tasks[0].time,'');
+assert.equal(validateBackup({...sample,tasks:[{...task,time:'10:15'}]}).tasks[0].time,'10:15');
+assert(validDate('2028-02-29'));assert(!validDate('2026-02-29'));assert(!validDate('2026-13-01'));
+const bad=(mutate)=>{const d=structuredClone(sample);mutate(d);assert.throws(()=>validateBackup(d));};
+bad(d=>d.tasks[0].id='\" onmouseover=\"alert(1)');bad(d=>d.photos[0].id='\"><img src=x>');bad(d=>d.tasks[0].status='unknown');bad(d=>d.tasks[0].date='2026-02-30');bad(d=>d.photos=[]);bad(d=>d.photos[0].taskId='other');bad(d=>d.photos[0].data='data:image/svg+xml;base64,PHN2Zz4=');bad(d=>d.tasks.push(d.tasks[0]));bad(d=>d.version=99);bad(d=>d.tasks[0].subject='');
+console.log('PASS: backup round-trip fields, image bytes, valid dates, and 10 malformed backup cases.');
