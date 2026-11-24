@@ -177,6 +177,17 @@ body:not(.dark) .eyebrow { color: #65518e; }
     opacity: 1;
     pointer-events: auto;
   }
+  :is(.task-dialog,.detail-dialog,.copy-dialog) {
+    position: fixed;
+    inset: auto 0 0;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    border-radius: 22px 22px 0 0;
+  }
+  .copy-dialog-body {
+    padding-bottom: max(18px,env(safe-area-inset-bottom));
+  }
 }
 
 @keyframes dialog-entry {
@@ -187,11 +198,25 @@ body:not(.dark) .eyebrow { color: #65518e; }
   from { opacity: 0; }
   to { opacity: 1; }
 }
+@keyframes sheet-entry {
+  from { opacity: .65; transform: translateY(36px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes mobile-scroll-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
 @media (prefers-reduced-motion: no-preference) {
   dialog[open]:not(.lightbox) {
     animation: dialog-entry 180ms cubic-bezier(.2,.75,.25,1);
   }
   dialog[open]::backdrop { animation: backdrop-entry 160ms ease-out; }
+  @media (max-width: 720px) {
+    dialog[open]:is(.task-dialog,.detail-dialog,.copy-dialog) {
+      animation-name: sheet-entry;
+      animation-duration: 230ms;
+    }
+  }
   @supports (overlay: auto) and (transition-behavior: allow-discrete) {
     dialog:not(.lightbox) {
       --dialog-rest: translateY(10px) scale(.985);
@@ -211,6 +236,14 @@ body:not(.dark) .eyebrow { color: #65518e; }
     @media (max-width: 720px), (pointer: coarse) {
       dialog[open]:not(.lightbox) { transition-duration: 170ms; }
     }
+    @media (max-width: 720px) {
+      dialog:is(.task-dialog,.detail-dialog,.copy-dialog):not(.lightbox) {
+        --dialog-rest: translateY(36px);
+      }
+      dialog[open]:is(.task-dialog,.detail-dialog,.copy-dialog):not(.lightbox) {
+        transition-duration: 230ms;
+      }
+    }
     dialog:not(.lightbox)::backdrop {
       opacity: 0;
       pointer-events: none;
@@ -228,6 +261,20 @@ body:not(.dark) .eyebrow { color: #65518e; }
   }
 }
 @media (max-width: 720px) and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: scroll(root block)) {
+    .topbar::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 -1px;
+      height: 2px;
+      background: linear-gradient(90deg,var(--purple),#6bc8dc);
+      pointer-events: none;
+      transform: scaleX(0);
+      transform-origin: left;
+      animation: mobile-scroll-progress linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
   .sidebar {
     transition: transform 180ms cubic-bezier(.4,0,1,1), visibility 0s 180ms;
   }
@@ -244,6 +291,13 @@ body:not(.dark) .eyebrow { color: #65518e; }
     transition: rotate 200ms cubic-bezier(.22,1,.36,1);
   }
   #menu-toggle[aria-expanded="true"] svg { rotate: 8deg; }
+  .tabs-row .tab.active {
+    animation: active-tab-underline 160ms ease-out;
+  }
+}
+@keyframes active-tab-underline {
+  from { border-bottom-color: transparent; }
+  to { border-bottom-color: var(--purple); }
 }
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   .task-card:hover, .subject-card:hover { transform: translateY(-2px); }
@@ -298,12 +352,22 @@ body:not(.dark) .eyebrow { color: #65518e; }
   margin: 0;
   padding: 0;
   border: 0;
+  overflow: visible;
   pointer-events: none;
   background: transparent url("./book-cursor.svg") center / contain no-repeat;
   perspective: 86px;
   transform-origin: 50% 72%;
 }
 .touch-book[hidden] { display: none; }
+.touch-book-ripple {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  opacity: 0;
+  border: 1px solid #b58bf0;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px #9471db26;
+}
 .touch-book-page {
   position: absolute;
   left: 47%;
@@ -329,4 +393,14 @@ body:not(.dark) .eyebrow { color: #65518e; }
   }
   :is(.task-card,.right-panel,.settings-card,.subject-card) { animation: none; }
   .button, .nav-item, .icon-button { touch-action: manipulation; }
+}
+
+@media (max-width: 720px) and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) and (animation-range: entry 0% entry 100%) {
+    .dashboard-aside .right-panel {
+      animation: panel-reveal ease-out both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
 }
