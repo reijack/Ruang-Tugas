@@ -35,18 +35,25 @@ function renderCalendar(){const y=calendarDate.getFullYear(),m=calendarDate.getM
 function renderSubjects(){return heading('Mata pelajaran','Semua tugas dan catatan, dikelompokkan sesuai mapelnya.',false).replace('</div></div>','</div><button class="button primary" data-action="add-subject">'+icon('plus')+'Tambah mapel</button></div>')+`<div class="subject-grid">${subjects.map(s=>{const items=tasks.filter(t=>t.subject===s.name),done=items.filter(t=>t.status==='selesai').length;return `<button class="subject-card" data-subject="${esc(s.name)}"><span class="subject-badge subject-${s.color}">${icon(s.icon)}</span><h3>${esc(s.name)}</h3><p>${items.length} tugas · ${items.length-done} masih aktif</p><div class="progress-track"><div style="width:${items.length?Math.round(done/items.length*100):0}%"></div></div><span class="progress-caption">${done} tugas selesai</span></button>`}).join('')}</div><p class="section-subtitle mt-6">Mapel yang kamu tambahkan langsung tersedia di form tugas dan filter.</p>`}
 function renderSettings(){const bytes=[...photos.values()].reduce((n,p)=>n+p.blob.size,0);return heading('Bikin ruangmu nyaman','Atur tampilan dan jaga salinan catatanmu.',false)+`<div class="settings-grid">${reminderSettingsHTML()}<section class="settings-card"><h3>Cadangan tugas & foto</h3><p>Unduh semua tugas beserta foto sebagai JSON. Impor kembali saat pindah browser atau perangkat. Data cadangan akan digabung berdasarkan ID tugas.</p><div class="settings-actions"><button class="button primary" data-action="export">${icon('download')}Ekspor cadangan</button><button class="button secondary" data-action="import">${icon('upload')}Impor JSON</button></div></section><section class="settings-card"><h3>Ruang pribadi di perangkatmu</h3><p>Tugas tersimpan di browser ini melalui IndexedDB. Perangkat lain memiliki data terpisah. Menghapus data browser juga menghapus tugas; simpan cadangan secara berkala.</p><div class="storage-details"><span>Tugas tersimpan</span><strong>${tasks.length}</strong></div><div class="storage-details"><span>Foto tersimpan</span><strong>${photos.size}</strong></div><div class="storage-details"><span>Ukuran foto</span><strong>${sizeLabel(bytes)}</strong></div></section><section class="settings-card"><h3>Tampilan & profil</h3><p>Pilih suasana yang paling nyaman untuk belajar.</p><div class="settings-actions"><select id="theme-select" aria-label="Tema tampilan"><option value="light" ${profile.theme==='light'?'selected':''}>Terang</option><option value="dark" ${profile.theme==='dark'?'selected':''}>Gelap</option></select><button class="button secondary" data-action="profile">${icon('edit')}Ubah profil</button></div></section><section class="settings-card"><h3>Tambah mata pelajaran</h3><p>Buat ruang untuk mapel sekolahmu sendiri.</p><form id="subject-form" class="flex gap-2"><label class="sr-only" for="new-subject">Nama mata pelajaran</label><input id="new-subject" placeholder="Nama mapel" maxlength="40" required><button class="button primary">Tambah</button></form><p class="section-subtitle mt-3">${subjects.length} mata pelajaran tersedia.</p></section></div>`}
 function render(){const titles={beranda:'Beranda',tugas:'Semua tugas',kalender:'Kalender',mapel:'Mata pelajaran',selesai:'Tugas selesai',pengaturan:'Pengaturan & cadangan'};$('#breadcrumb-current').textContent=titles[page];$$('[data-page]').forEach(n=>{n.classList.toggle('active',n.dataset.page===page);if(n.dataset.page===page)n.setAttribute('aria-current','page');else n.removeAttribute('aria-current')});$('#nav-count').textContent=tasks.filter(t=>t.status!=='selesai').length;showAvatar($('#profile-btn'),profile.photo,profile.name);$('#main').innerHTML=page==='beranda'?renderHome():page==='kalender'?renderCalendar():page==='mapel'?renderSubjects():page==='pengaturan'?renderSettings():renderTasks();updateReminderUI();}
-function navigate(next,filter=''){if(!['beranda','tugas','kalender','mapel','selesai','pengaturan'].includes(next))next='beranda';const changedPage=page!==next;page=next;tab=next==='selesai'?'selesai':'aktif';query='';subjectFilter=filter;history.replaceState(null,'',`#${page}`);$('#sidebar').classList.remove('open');render();window.scrollTo({top:0,behavior:'instant'});if(changedPage)animatePageEntry();}
-
-function animatePageEntry(){
-  const main=$('#main');
-  if(!main.animate || !window.matchMedia('(prefers-reduced-motion: no-preference)').matches)return;
-  Array.from(main.children).slice(0,5).forEach((section,index)=>{
-    section.animate([
-      {opacity:0.5,transform:'translateY(10px)'},
-      {opacity:1,transform:'translateY(0)'}
-    ],{duration:290,delay:index*25,fill:'backwards',easing:'cubic-bezier(.18,.78,.24,1)'});
-  });
+const pageOrder=['beranda','tugas','kalender','mapel','selesai','pengaturan'];
+function setMenuOpen(open){
+  $('#sidebar').classList.toggle('open',open);
+  $('#menu-toggle').setAttribute('aria-expanded',String(open));
 }
+function navigate(next,filter=''){
+  if(!pageOrder.includes(next))next='beranda';
+  const direction=Math.sign(pageOrder.indexOf(next)-pageOrder.indexOf(page));
+  page=next;
+  tab=next==='selesai'?'selesai':'aktif';
+  query='';
+  subjectFilter=filter;
+  history.replaceState(null,'',`#${page}`);
+  setMenuOpen(false);
+  render();
+  window.scrollTo({top:0,behavior:'instant'});
+  if(direction)$('#main').dispatchEvent(new CustomEvent('ruang-tugas:page-entry',{bubbles:true,detail:{direction}}));
+}
+
 async function openForm(id=null,chosenDate=null){editing=id;uploadGeneration++;draftPhotos=[];processing=false;$('#task-form').reset();$('#form-error').textContent='';$('#upload-status').textContent='';$('#save-task').disabled=false;$('#save-task').textContent='Simpan tugas';$('#task-subject').innerHTML=subjects.map(s=>`<option>${esc(s.name)}</option>`).join('');const t=tasks.find(t=>t.id===id);$('#form-title').textContent=t?'Edit tugas':'Tambah tugas';$('#task-title').value=t?.title||'';$('#task-subject').value=t?.subject||subjectFilter||subjects[0].name;$('#task-date').value=t?.date||chosenDate||today();$('#task-time').value=t?.time||'';$('#task-status').value=t?.status||'belum';$('#task-priority').value=t?.priority||'normal';$('#task-notes').value=t?.notes||'';draftPhotos=(t?.photoIds||[]).map(id=>({...photos.get(id)})).filter(p=>p.blob);renderDraftPhotos();$('#task-dialog').showModal();setTimeout(()=>$('#task-title').focus(),30)}
 function renderDraftPhotos(){$('#photo-previews').innerHTML=draftPhotos.map(p=>`<div class="preview-card"><img src="${photoURL(p)}" alt="Pratinjau foto"><button type="button" class="remove-photo" data-remove-photo="${p.id}" aria-label="Hapus foto">${icon('x')}</button><input value="${esc(p.caption)}" data-caption="${p.id}" maxlength="160" placeholder="Keterangan foto" aria-label="Keterangan foto"><small>${sizeLabel(p.blob.size)}${p.originalSize?' · dari '+sizeLabel(p.originalSize):''}</small></div>`).join('')}
 function sizeLabel(n){return n<1024?`${n} B`:n<1048576?`${Math.round(n/1024)} KB`:`${(n/1048576).toFixed(1)} MB`}
@@ -161,38 +168,24 @@ function turnBookPage(event){
   }
   advance();
 }
-let lastPointerType='';
-function showTouchBook(event){
-  if(!event.detail || (event.pointerType||lastPointerType)!=='touch')return;
-  const x=event.clientX,y=event.clientY;
-  requestAnimationFrame(()=>{
-    document.querySelector('.touch-book')?.remove();
-    const book=document.createElement('span');
-    book.className='touch-book';
-    book.setAttribute('aria-hidden','true');
-    book.style.left=Math.max(0,Math.min(innerWidth-38,x-12))+'px';
-    book.style.top=Math.max(0,Math.min(innerHeight-38,y-42))+'px';
-    if(typeof book.showPopover==='function'){
-      book.setAttribute('popover','manual');
-      document.body.append(book);
-      book.showPopover();
-    }else{
-      const dialogs=document.querySelectorAll('dialog[open]');
-      (dialogs[dialogs.length-1]||document.body).append(book);
-    }
-    setTimeout(()=>book.remove(),620);
-  });
-}
 function bindEvents(){
   if(window.matchMedia('(any-pointer: fine) and (prefers-reduced-motion: no-preference)').matches){
     bookTurnFrames.forEach(src=>{const image=new Image();image.src=src});
   }
-  document.addEventListener('pointerdown',event=>{
-    lastPointerType=event.pointerType;
-    turnBookPage(event);
-  },{passive:true,capture:true});
-  document.addEventListener('click',showTouchBook,true);
-  document.addEventListener('click',handleClick);$('#menu-toggle').onclick=()=>$('#sidebar').classList.toggle('open');document.addEventListener('click',e=>{if($('#sidebar').classList.contains('open')&&!e.target.closest('#sidebar,#menu-toggle'))$('#sidebar').classList.remove('open')});$('#profile-btn').onclick=openProfile;$('#week-start').oninput=()=>updateWeekCopy(true);$('#week-end').oninput=()=>updateWeekCopy(false);$('#week-form').onsubmit=copyWeek;$('#copy-select-all').onclick=()=>{$('#copy-text').focus();$('#copy-text').select()};document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-open]')&&!e.target.matches('button')){e.preventDefault();openDetail(e.target.dataset.open)}if($('#lightbox').open){if(e.key==='ArrowRight'&&lightIndex<lightPhotos.length-1){lightIndex++;updateLightbox()}if(e.key==='ArrowLeft'&&lightIndex>0){lightIndex--;updateLightbox()}}});document.addEventListener('input',e=>{if(e.target.id==='search'){query=e.target.value;$('#task-list').innerHTML=listHTML()}if(e.target.dataset.caption){const p=draftPhotos.find(p=>p.id===e.target.dataset.caption);if(p)p.caption=e.target.value}});document.addEventListener('change',async e=>{try{if(e.target.id==='subject-filter'){subjectFilter=e.target.value;$('#task-list').innerHTML=listHTML()}if(e.target.id==='sort-filter'){sort=e.target.value;$('#task-list').innerHTML=listHTML()}if(e.target.id==='theme-select'){await setTheme(e.target.value)}}catch{notify('Pengaturan belum tersimpan. Coba lagi.')}});$('#task-form').onsubmit=saveTask;$('#choose-photos').onclick=()=>$('#photo-input').click();$('#take-photo').onclick=()=>$('#camera-input').click();$('#photo-input').onchange=e=>addPhotos(e.target.files);$('#camera-input').onchange=e=>addPhotos(e.target.files);const dz=$('#dropzone');['dragenter','dragover'].forEach(type=>dz.addEventListener(type,e=>{e.preventDefault();dz.classList.add('drag')}));['dragleave','drop'].forEach(type=>dz.addEventListener(type,e=>{e.preventDefault();dz.classList.remove('drag');if(type==='drop')addPhotos(e.dataTransfer.files)}));$('#zoom-in').onclick=()=>{zoom=Math.min(4,zoom+.25);transformImage()};$('#zoom-out').onclick=()=>{zoom=Math.max(.5,zoom-.25);transformImage()};$('#rotate-image').onclick=()=>{rotation+=90;transformImage()};$('#prev-photo').onclick=()=>{if(lightIndex>0){lightIndex--;updateLightbox()}};$('#next-photo').onclick=()=>{if(lightIndex<lightPhotos.length-1){lightIndex++;updateLightbox()}};$('#import-input').onchange=e=>importBackup(e.target.files[0]);$('#profile-photo').onchange=chooseAvatar;$('#profile-form').onsubmit=async e=>{e.preventDefault();const name=$('#profile-name').value.trim();if($('#profile-save').disabled)return;if(!name&&profile.name){$('#profile-error').textContent='Isi nama panggilanmu.';return}try{const next={...profile,name,photo:draftAvatar};await setMeta('profile',next);profile=next;$('#profile-dialog').close();render();notify('Profil tersimpan.')}catch{$('#profile-error').textContent='Profil belum tersimpan. Coba lagi.'}};document.addEventListener('submit',submitSubject);$('#subject-dialog').addEventListener('close',()=>{$('#subject-error').textContent=''});window.addEventListener('hashchange',()=>navigate(location.hash.slice(1)));window.addEventListener('focus',()=>{if(!$$('dialog[open]').length)refreshData().catch(()=>{})});}
+  document.addEventListener('pointerdown',turnBookPage,{passive:true,capture:true});
+  document.addEventListener('click',handleClick);
+  const menuToggle=$('#menu-toggle');
+  menuToggle.onclick=()=>setMenuOpen(!$('#sidebar').classList.contains('open'));
+  document.addEventListener('click',event=>{
+    if($('#sidebar').classList.contains('open')&&!event.target.closest('#sidebar,#menu-toggle'))setMenuOpen(false);
+  });
+  document.addEventListener('keydown',event=>{
+    if(event.key==='Escape'&&$('#sidebar').classList.contains('open')&&!$('dialog[open]')){
+      setMenuOpen(false);
+      menuToggle.focus();
+    }
+  });
+  $('#profile-btn').onclick=openProfile;$('#week-start').oninput=()=>updateWeekCopy(true);$('#week-end').oninput=()=>updateWeekCopy(false);$('#week-form').onsubmit=copyWeek;$('#copy-select-all').onclick=()=>{$('#copy-text').focus();$('#copy-text').select()};document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-open]')&&!e.target.matches('button')){e.preventDefault();openDetail(e.target.dataset.open)}if($('#lightbox').open){if(e.key==='ArrowRight'&&lightIndex<lightPhotos.length-1){lightIndex++;updateLightbox()}if(e.key==='ArrowLeft'&&lightIndex>0){lightIndex--;updateLightbox()}}});document.addEventListener('input',e=>{if(e.target.id==='search'){query=e.target.value;$('#task-list').innerHTML=listHTML()}if(e.target.dataset.caption){const p=draftPhotos.find(p=>p.id===e.target.dataset.caption);if(p)p.caption=e.target.value}});document.addEventListener('change',async e=>{try{if(e.target.id==='subject-filter'){subjectFilter=e.target.value;$('#task-list').innerHTML=listHTML()}if(e.target.id==='sort-filter'){sort=e.target.value;$('#task-list').innerHTML=listHTML()}if(e.target.id==='theme-select'){await setTheme(e.target.value)}}catch{notify('Pengaturan belum tersimpan. Coba lagi.')}});$('#task-form').onsubmit=saveTask;$('#choose-photos').onclick=()=>$('#photo-input').click();$('#take-photo').onclick=()=>$('#camera-input').click();$('#photo-input').onchange=e=>addPhotos(e.target.files);$('#camera-input').onchange=e=>addPhotos(e.target.files);const dz=$('#dropzone');['dragenter','dragover'].forEach(type=>dz.addEventListener(type,e=>{e.preventDefault();dz.classList.add('drag')}));['dragleave','drop'].forEach(type=>dz.addEventListener(type,e=>{e.preventDefault();dz.classList.remove('drag');if(type==='drop')addPhotos(e.dataTransfer.files)}));$('#zoom-in').onclick=()=>{zoom=Math.min(4,zoom+.25);transformImage()};$('#zoom-out').onclick=()=>{zoom=Math.max(.5,zoom-.25);transformImage()};$('#rotate-image').onclick=()=>{rotation+=90;transformImage()};$('#prev-photo').onclick=()=>{if(lightIndex>0){lightIndex--;updateLightbox()}};$('#next-photo').onclick=()=>{if(lightIndex<lightPhotos.length-1){lightIndex++;updateLightbox()}};$('#import-input').onchange=e=>importBackup(e.target.files[0]);$('#profile-photo').onchange=chooseAvatar;$('#profile-form').onsubmit=async e=>{e.preventDefault();const name=$('#profile-name').value.trim();if($('#profile-save').disabled)return;if(!name&&profile.name){$('#profile-error').textContent='Isi nama panggilanmu.';return}try{const next={...profile,name,photo:draftAvatar};await setMeta('profile',next);profile=next;$('#profile-dialog').close();render();notify('Profil tersimpan.')}catch{$('#profile-error').textContent='Profil belum tersimpan. Coba lagi.'}};document.addEventListener('submit',submitSubject);$('#subject-dialog').addEventListener('close',()=>{$('#subject-error').textContent=''});window.addEventListener('hashchange',()=>navigate(location.hash.slice(1)));window.addEventListener('focus',()=>{if(!$$('dialog[open]').length)refreshData().catch(()=>{})});}
 async function init(){icons();$('#today-label').innerHTML=icon('calendar')+new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});try{db=await openDB();const [storedProfile,storedSubjects,storedReminders]=await Promise.all([request('meta','get','profile'),request('meta','get','subjects'),request('meta','get','reminderPrefs')]);if(storedReminders)reminderPrefs=RuangReminders.normalize(storedReminders.value);if(storedProfile)profile=storedProfile.value;if(storedSubjects)subjects=storedSubjects.value;applyTheme(profile.theme);await clearLegacyExamples();bindEvents();tasks=await request('tasks','getAll');photos=new Map((await request('photos','getAll')).map(p=>[p.id,p]));navigate(location.hash.slice(1)||'beranda');if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});startReminders();const taskLink=new URLSearchParams(location.search).get('task');if(taskLink&&tasks.some(t=>t.id===taskLink))openDetail(taskLink)}catch(e){console.error(e);$('#main').innerHTML='<div class="error-banner"><h2>Penyimpanan belum bisa dibuka.</h2><p>Izinkan penyimpanan situs di pengaturan browser, lalu muat ulang. Coba gunakan mode browser biasa.</p><button class="button secondary mt-4" onclick="location.reload()">Muat ulang</button></div>'}}
 function openSubjectDialog(){
   $('#subject-dialog-form').reset();$('#subject-error').textContent='';
