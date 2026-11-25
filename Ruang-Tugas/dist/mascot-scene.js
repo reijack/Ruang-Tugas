@@ -7,9 +7,11 @@ const RuangMascotScene = (() => {
   const sprite = stage.querySelector('.mascot-scene-sprite');
   const outgoing = stage.querySelector('.mascot-scene-outgoing');
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  const center = 50;
+  const sideStops = { L: 20, R: 80 };
   let character;
   let defaultPose;
-  let position = 50;
+  let position = center;
   let generation = 0;
   let pending;
   let movement;
@@ -70,7 +72,7 @@ const RuangMascotScene = (() => {
   }
 
   function translate(percent) {
-    return `translateX(${(percent - 50) * .30}%)`;
+    return `translateX(${(percent - center) * .47}%)`;
   }
 
   function stop() {
@@ -97,7 +99,7 @@ const RuangMascotScene = (() => {
     if (character !== id) {
       character = id;
       stage.dataset.character = id;
-      position = 50;
+      position = center;
       track.style.transform = '';
     }
     defaultPose = pose;
@@ -125,7 +127,7 @@ const RuangMascotScene = (() => {
   }
 
   async function walk(target, run) {
-    target = Math.max(0, Math.min(100, target));
+    target = Math.max(sideStops.L, Math.min(sideStops.R, target));
     const distance = Math.abs(target - position);
     if (distance < .25) return;
     const duration = Math.min(1120, 310 + distance * 17);
@@ -155,6 +157,7 @@ const RuangMascotScene = (() => {
     }
     const run = generation;
     const scene = RuangMascotScenes[id].scenes.find(item => item.pose === pose || item.actions.includes('e:' + pose));
+    const hasTravel = scene.actions.some(action => action.startsWith('w') && Number(action.slice(1)) !== center);
     stage.dataset.scene = scene.name;
     show(idle ? scene.pose : pose);
     for (const action of scene.actions) {
@@ -162,19 +165,27 @@ const RuangMascotScene = (() => {
       if (action.startsWith('w')) await walk(Number(action.slice(1)), run);
       else if (action.startsWith('p')) await wait(Math.min(1050, Number(action.slice(1))));
       else if (action.startsWith('e:')) show(action.slice(2));
-      else {
+      else if (!hasTravel && Object.hasOwn(sideStops, action)) {
+        look(action);
+        await walk(sideStops[action], run);
+      } else {
         look(action);
         await wait(330);
       }
     }
-    if (run === generation && !idle) show(defaultPose);
+    if (run !== generation || idle) return;
+    await walk(center, run);
+    if (run === generation) {
+      look('F');
+      show(defaultPose);
+    }
   }
 
   function rest() {
     stop();
     if (defaultPose) show(defaultPose, false);
     if (motion.matches) {
-      position = 50;
+      position = center;
       track.style.transform = '';
     }
   }
