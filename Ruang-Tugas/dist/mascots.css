@@ -1,0 +1,273 @@
+:root[data-mascot="lila"] {
+  --mascot-accent: #6045ba;
+  --mascot-ink: #584d72;
+  --mascot-base: #efedf9;
+  --mascot-soft: #ece5ff;
+  --mascot-cool: #c3e6f3;
+  --mascot-glow: #d2c2f8;
+  --mascot-paper: #f8f6ff;
+  --mascot-primary: #7451c2;
+  --mascot-primary-deep: #51339e;
+}
+:root[data-mascot="rimba"] {
+  --mascot-accent: #2a6048;
+  --mascot-ink: #486254;
+  --mascot-base: #e7f2e8;
+  --mascot-soft: #dcefe0;
+  --mascot-cool: #c0ebe2;
+  --mascot-glow: #c6dfae;
+  --mascot-paper: #f5faf3;
+  --mascot-primary: #34704f;
+  --mascot-primary-deep: #20543e;
+}
+:root[data-mascot="ambar"] {
+  --mascot-accent: #8d421f;
+  --mascot-ink: #755447;
+  --mascot-base: #faeee0;
+  --mascot-soft: #fbe6cb;
+  --mascot-cool: #f5c4a8;
+  --mascot-glow: #f9d5a0;
+  --mascot-paper: #fff8ef;
+  --mascot-primary: #a15122;
+  --mascot-primary-deep: #78361c;
+}
+:root[data-mascot="lila"][data-theme="dark"] {
+  --mascot-accent: #cfbbff; --mascot-ink: #bfb2d2; --mascot-base: #201e2e;
+  --mascot-soft: #392d53; --mascot-cool: #294d61; --mascot-glow: #4b345e; --mascot-paper: #252235;
+}
+:root[data-mascot="rimba"][data-theme="dark"] {
+  --mascot-accent: #a8ecc5; --mascot-ink: #b6d3c1; --mascot-base: #172921;
+  --mascot-soft: #264338; --mascot-cool: #225346; --mascot-glow: #354b32; --mascot-paper: #20362c;
+}
+:root[data-mascot="ambar"][data-theme="dark"] {
+  --mascot-accent: #ffc19a; --mascot-ink: #e0bfae; --mascot-base: #2b211e;
+  --mascot-soft: #503427; --mascot-cool: #5c382b; --mascot-glow: #583729; --mascot-paper: #392a23;
+}
+
+:root[data-mascot] { background: var(--mascot-base); }
+:root[data-mascot] body {
+  --purple: var(--mascot-accent);
+  --purple-dark: var(--mascot-primary-deep);
+  --purple-soft: var(--mascot-soft);
+  --bg: var(--mascot-base);
+  --muted: var(--mascot-ink);
+  --hero-fill: linear-gradient(118deg,var(--mascot-soft) 10%,var(--mascot-glow) 56%,var(--mascot-cool));
+  --glass-pane: var(--mascot-paper);
+  --glass-bar: var(--mascot-paper);
+  --surface: var(--mascot-paper);
+  --border: var(--mascot-soft);
+  background-color: var(--mascot-base);
+  background-image: radial-gradient(ellipse at 93% 8%,var(--mascot-cool),transparent 40%),
+    radial-gradient(ellipse at 24% 32%,var(--mascot-glow),transparent 48%),
+    linear-gradient(155deg,var(--mascot-base),var(--mascot-paper) 88%);
+}
+@supports (color: color-mix(in srgb,white,transparent)) {
+  :root[data-mascot] body {
+    --glass-pane: linear-gradient(135deg,var(--mascot-paper),color-mix(in srgb,var(--mascot-paper) 72%,transparent));
+    --glass-bar: color-mix(in srgb,var(--mascot-paper) 90%,transparent);
+    --border: color-mix(in srgb,var(--mascot-accent) 16%,var(--mascot-paper));
+  }
+}
+:root[data-mascot][data-theme="dark"] body {
+  --glass-line: var(--border);
+}
+:root[data-mascot] body .welcome-banner {
+  background: var(--hero-fill);
+  border-color: var(--glass-line);
+}
+:root[data-mascot] body :is(.sidebar-note,.tip-card) {
+  background: var(--glass-pane);
+  border-color: var(--glass-line);
+}
+:root[data-mascot] body :is(.welcome-banner p,.sidebar-note p,.tip-card p) { color: var(--muted); }
+:root[data-mascot] body .tip-card strong { color: var(--mascot-accent); }
+:root[data-mascot] body :is(.primary,.brand-symbol) {
+  background: linear-gradient(152deg,var(--mascot-primary),var(--mascot-primary-deep));
+  box-shadow: inset 0 1px 0 #fff4, 0 4px 12px #10101826;
+}
+:root[data-mascot] body .primary:hover { background: var(--mascot-primary-deep); }
+:root[data-mascot] body :is(.nav-item.active,.tab.active,.eyebrow,.purple-text,.text-link,.footer-heart) {
+  color: var(--mascot-accent);
+}
+:root[data-mascot] body :is(.tab-count,.view-switch button.active,.avatar,.nav-item.active,.stat-icon:not(.orange,.blue,.green)) {
+  color: var(--mascot-accent);
+  background: var(--mascot-soft);
+}
+:root[data-mascot] body :is(.week-num.active,.calendar-cell.today .day-label,.reminder-badge) {
+  color: #fff;
+  background: var(--mascot-primary-deep);
+}
+:root[data-mascot] body .avatar { border-color: var(--border); }
+:root[data-mascot] body .progress-track { background: var(--mascot-soft); }
+:root[data-mascot] body .progress-track div { background: var(--mascot-accent); }
+:root[data-mascot] body :is(button, a, select, input, textarea):focus-visible { outline-color: var(--mascot-accent); }
+:root[data-mascot] .topbar::after { background: linear-gradient(90deg,var(--mascot-accent),var(--mascot-cool)); }
+
+.mascot-portrait {
+  display: block;
+  flex: none;
+  aspect-ratio: 1;
+  background-color: var(--mascot-soft);
+  background-repeat: no-repeat;
+  border-radius: inherit;
+}
+.mascot-trigger {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  flex: none;
+  padding: 3px;
+  border: 1px solid var(--glass-line);
+  border-radius: 14px;
+  background: var(--mascot-soft);
+}
+.mascot-trigger .mascot-portrait { width: 100%; border-radius: 10px; }
+body {
+  --mascot-dock-width: clamp(112px,10vw,146px);
+  --mascot-dock-left: max(14px,env(safe-area-inset-left));
+  --mascot-dock-bottom: max(14px,env(safe-area-inset-bottom));
+  --mascot-dock-clearance: calc(var(--mascot-dock-width) + var(--mascot-dock-bottom) + 36px);
+}
+.sidebar {
+  bottom: var(--mascot-dock-clearance);
+  border-bottom: 1px solid var(--glass-line);
+  border-bottom-right-radius: 18px;
+}
+.mascot-dock {
+  position: fixed;
+  left: var(--mascot-dock-left);
+  bottom: var(--mascot-dock-bottom);
+  z-index: 32;
+  width: var(--mascot-dock-width);
+}
+.mascot-dock button {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 5px 5px 7px;
+  border: 1px solid var(--glass-line);
+  border-radius: 19px;
+  background: var(--surface);
+  box-shadow: var(--glass-rim), var(--glass-shadow);
+}
+.mascot-glance {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 14px;
+  background: radial-gradient(ellipse at 50% 93%,#2720352e,transparent 38%),
+    radial-gradient(circle at 35% 22%,var(--mascot-paper),transparent 68%),
+    linear-gradient(145deg,var(--mascot-glow),var(--mascot-cool));
+}
+.mascot-glance::before {
+  content: "";
+  position: absolute;
+  inset: 83% 0 0;
+  background: #261b3630;
+}
+.mascot-glance[data-character="lila"] { background: linear-gradient(#d7cefa,#92b9f0 76%,#729ad9); }
+.mascot-glance[data-character="rimba"] { background: linear-gradient(#f1f4c6,#a7d39a 76%,#77ac76); }
+.mascot-glance[data-character="ambar"] { background: linear-gradient(#fff0ce,#f3cf9e 76%,#daaa74); }
+.mascot-scene-track { position: absolute; inset: 0; }
+.mascot-scene-shadow {
+  position: absolute;
+  width: 46%;
+  height: 10%;
+  left: 27%;
+  bottom: 11%;
+  border-radius: 50%;
+  opacity: .84;
+  background: radial-gradient(ellipse,#25213a57 0%,transparent 70%);
+}
+.mascot-scene-actor {
+  position: absolute;
+  width: 69%;
+  height: 76%;
+  inset: auto 15.5% 13%;
+  z-index: 1;
+  transform-origin: center bottom;
+}
+.mascot-scene-facing,.mascot-scene-sprite { display: block; position: absolute; inset: 0; width: 100%; height: 100%; }
+.mascot-scene-facing { transform-origin: 50% 68%; }
+.mascot-scene-sprite { object-fit: contain; object-position: center bottom; transform-origin: center bottom; }
+.mascot-scene-outgoing { opacity: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .mascot-scene-facing {
+    --scene-turn: 0deg;
+    --scene-lean: 0deg;
+    --scene-shift: 0%;
+    transform: perspective(180px) translateX(var(--scene-shift)) rotateY(var(--scene-turn)) rotate(var(--scene-lean));
+    transition: transform 310ms cubic-bezier(.24,.82,.34,1.08);
+  }
+  .mascot-scene-facing[data-direction="L"] { --scene-turn: -24deg; --scene-lean: -3deg; --scene-shift: -2%; }
+  .mascot-scene-facing[data-direction="R"] { --scene-turn: 24deg; --scene-lean: 3deg; --scene-shift: 2%; }
+}
+.mascot-dock strong { font-size: 13px; line-height: 1.2; color: var(--mascot-accent); }
+:root[data-mascot] body .has-mascot .mascot-message {
+  margin-top: 13px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mascot-accent);
+}
+.mascot-dialog { width: 510px; }
+.mascot-current {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 16px 0 18px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--mascot-soft);
+}
+.mascot-current button { padding: 0; border-radius: 12px; flex: none; }
+.mascot-current .mascot-portrait { width: 62px; }
+.mascot-current p { margin: 4px 0 0; font-size: 12px; }
+.mascot-options { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+.mascot-option {
+  display: grid;
+  align-content: start;
+  gap: 5px;
+  min-width: 0;
+  padding: 6px;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--surface);
+}
+.mascot-option[aria-pressed="true"] {
+  border-color: var(--mascot-accent);
+  background: var(--mascot-soft);
+  box-shadow: inset 0 0 0 1px var(--mascot-accent);
+}
+.mascot-option .mascot-portrait { width: 100%; border-radius: 8px; }
+.mascot-option strong { font-size: 13px; }
+.mascot-option small { color: var(--muted); font-size: 11px; line-height: 1.4; }
+@media (prefers-reduced-motion: no-preference) {
+  :is(.mascot-dock button,.mascot-option,.mascot-trigger,.mascot-current button) {
+    transition: border-color 150ms ease, scale 170ms cubic-bezier(.22,1,.36,1);
+  }
+  :is(.mascot-dock button,.mascot-option,.mascot-trigger,.mascot-current button):active { scale: .96; }
+}
+@media (max-width: 720px) {
+  body {
+    --mascot-dock-width: 80px;
+    --mascot-dock-left: max(8px,env(safe-area-inset-left));
+    --mascot-dock-bottom: max(8px,env(safe-area-inset-bottom));
+  }
+  .topbar .mascot-trigger { width: 40px; height: 40px; }
+  .topbar .breadcrumb strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .topbar .mobile-menu, .topbar-right { flex-shrink: 0; }
+  .mascot-dock button { gap: 3px; padding: 3px 3px 5px; border-radius: 15px; }
+  .mascot-dock .mascot-glance { border-radius: 11px; }
+  .mascot-dock strong { font-size: 11px; }
+  .app-footer { padding-bottom: var(--mascot-dock-clearance); }
+  :root[data-mascot] body .has-mascot .mascot-message { font-size: 12px; }
+}
+@media (max-height: 500px) {
+  body { --mascot-dock-width: 72px; }
+}

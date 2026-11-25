@@ -5,7 +5,7 @@
   "description": "Pencatat tugas dan foto catatan sekolah",
   "scripts": {
     "build": "tailwindcss -i src/tailwind.css -o dist/tailwind.css --minify && npm run build:animations",
-    "check": "node --check dist/app.js && node --check dist/reminders.js && node --check dist/sw.js && node --check dist/task-copy.js && node --check dist/theme-init.js && node --check dist/animations.js",
+    "check": "node --check dist/app.js && node --check dist/reminders.js && node --check dist/sw.js && node --check dist/task-copy.js && node --check dist/theme-init.js && node --check dist/animations.js && node --check dist/mascots.js && node --check dist/mascot-scene-data.js && node --check dist/mascot-scene.js",
     "test": "node tests/backup.test.cjs && node tests/reminders.test.cjs && node tests/task-copy.test.cjs",
     "build:animations": "esbuild src/animations.jsx --bundle --jsx=automatic --minify --outfile=dist/animations.js"
   },
